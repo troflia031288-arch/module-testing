@@ -1,54 +1,51 @@
 package edu.innotech;
 
-import lombok.*;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import java.util.Arrays;
 
-import java.awt.*;
-import java.util.ArrayList;
-
-@ToString
-@EqualsAndHashCode
-@ToString
-@EqualsAndHashCode
 public class Student {
-
-    @Getter    @Setter
+    private int id;
     private String name;
-    private List<Integer> grades = new ArrayList<>();
-    private GradeCheckService gradeCheckService;
+    private int[] marks;
 
-    public Student(String name) {
+    public Student() {}
+
+    public Student(int id, String name, int[] marks) {
+        this.id = id;
         this.name = name;
-        this.gradeCheckService = gradeCheckService;
+        this.marks = marks != null ? Arrays.copyOf(marks, marks.length) : new int[0]; // Защита от null
     }
 
-    public List<Integer> getGrades() {
-        return new ArrayList<>(grades);
+    // Геттеры и сеттеры
+    public int getId() {
+        return id;
     }
 
-    @SneakyThrows
-    public void addGrade(int grade) {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet request = new HttpGet("http://localhost:5352/checkGrade?grade="+grade);
-        CloseableHttpResponse httpResponse = httpClient.execute(request);
-        HttpEntity entity = httpResponse.getEntity();
-        if(!Boolean.parseBoolean(EntityUtils.toString(entity))){
-            throw new IllegalArgumentException(grade + " is wrong grade");
-        }
-        grades.add(grade);
+    public void setId(int id) {
+        this.id = id;
     }
 
-    @SneakyThrows
-    public int raiting() {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet request = new HttpGet("http://localhost:5352/educ?sum="+grades.stream().mapToInt(x->x).sum());
-        CloseableHttpResponse httpResponse = httpClient.execute(request);
-        HttpEntity entity = httpResponse.getEntity();
-        return Integer.parseInt(EntityUtils.toString(entity));
+    public String getName() {
+        return name;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int[] getMarks() {
+        return Arrays.copyOf(marks, marks.length);
+    }
+
+    public void setMarks(int[] marks) {
+        this.marks = marks != null ? Arrays.copyOf(marks, marks.length) : new int[0];
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name +  ", marks=" + Arrays.toString(marks) +
+                "}";
+    }
+
 }
