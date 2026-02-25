@@ -2,6 +2,7 @@ package edu.innotech;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,7 +33,13 @@ public class StudentApiTest {
                 .statusCode(201);
     }
 
-
+    @BeforeAll
+    public static void setup() {
+        // Установка базового URI (если нужно)
+        RestAssured.baseURI = "http://localhost:8080";
+        // Установка парсера по умолчанию
+        RestAssured.defaultParser = io.restassured.parsing.Parser.JSON;
+    }
 
     @Test @SneakyThrows
     public void testGetStudentByIdReturnsStudent() {
@@ -107,18 +114,26 @@ public class StudentApiTest {
         Assertions.assertEquals("Ivan Ivanov", retrievedStudent.getName());
     }
 
-    @Test @SneakyThrows
+    @Test
     public void testPostStudentReturnsNewIdForNullId() {
-        Student studentWithNullId = new Student(0, "Petr Petrov", new int[]{3, 4, 5});
+        // Создаем массив оценок
+        int[] marks = {3, 4, 5};
 
-        int id = RestAssured.given()
-                .baseUri("http://localhost:8080/student")
-                .contentType(ContentType.JSON).body(studentWithNullId)
+        Student studentWithNullId = new Student(0, "Alina Sidorova", marks);
+
+        Response response = RestAssured.given()
+                .basePath("/student")
+                .contentType(ContentType.JSON)
+                .body(studentWithNullId)
                 .when()
-                .post()
-                .then()
-                .statusCode(201)
-                .extract().path("id");
+                .post();
+
+        Assertions.assertEquals(201, response.getStatusCode());
+
+        Assertions.assertFalse(response.getBody().asString().isEmpty(), "Тело запроса не должно быть пустым");
+
+        Student createdStudent = response.as(Student.class);
+        int id = createdStudent.getId();
 
         Assertions.assertTrue(id > 0);
     }
