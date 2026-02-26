@@ -35,9 +35,7 @@ public class StudentApiTest {
 
     @BeforeAll
     public static void setup() {
-        // Установка базового URI (если нужно)
         RestAssured.baseURI = "http://localhost:8080";
-        // Установка парсера по умолчанию
         RestAssured.defaultParser = io.restassured.parsing.Parser.JSON;
     }
 
@@ -101,7 +99,7 @@ public class StudentApiTest {
                 .when()
                 .post()
                 .then()
-                .statusCode(201); // Ожидаем статус 201
+                .statusCode(201);
 
         Student retrievedStudent = RestAssured.given()
                 .baseUri("http://localhost:8080/student/1")
@@ -116,7 +114,6 @@ public class StudentApiTest {
 
     @Test
     public void testPostStudentReturnsNewIdForNullId() {
-        // Создаем массив оценок
         int[] marks = {3, 4, 5};
 
         Student studentWithNullId = new Student(0, "Alina Sidorova", marks);
@@ -160,9 +157,8 @@ public class StudentApiTest {
                 .baseUri("http://localhost:8080/student/" + id)
                 .when().delete()
                 .then()
-                .statusCode(200); // Ожидаем статус 200 OK
+                .statusCode(200);
 
-        // Проверяем, что студент удален
         RestAssured.given()
                 .baseUri("http://localhost:8080/student/" + id)
                 .when().get()
@@ -196,7 +192,6 @@ public class StudentApiTest {
 
     @Test @SneakyThrows
     public void testGetTopStudentReturnsEmptyBodyIfNoMarks() {
-        // Добавим студента без оценок
         Student studentWithoutMarks = new Student(2, "Zhenya", new int[]{});
 
         RestAssured.given()
@@ -216,7 +211,6 @@ public class StudentApiTest {
 
     @Test @SneakyThrows
     public void testGetTopStudentReturnsOneStudentWithHighestAverage() {
-        // Добавим студентов с оценками
         Student student1 = new Student(3, "Katya", new int[]{5, 5, 4});
         Student student2 = new Student(4, "Dima", new int[]{3, 3, 3});
 
@@ -234,7 +228,8 @@ public class StudentApiTest {
     @Test @SneakyThrows
     public void testGetTopStudentReturnsMultipleStudentsWithSameAverage() {
         Student student1 = new Student(5, "Miron", new int[]{4, 4, 4});
-        Student student2 = new Student(6, "Anton", new int[]{4, 4, 4});RestAssured.given().baseUri("http://localhost:8080/student").contentType(ContentType.JSON).body(student1).when().post();
+        Student student2 = new Student(6, "Anton", new int[]{4, 4, 4});
+        RestAssured.given().baseUri("http://localhost:8080/student").contentType(ContentType.JSON).body(student1).when().post();
         RestAssured.given().baseUri("http://localhost:8080/student").contentType(ContentType.JSON).body(student2).when().post();
 
         RestAssured.given()
