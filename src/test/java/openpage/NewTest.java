@@ -22,6 +22,8 @@ public class NewTest {
     public void setUp() {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\rus21\\ChromeDriver\\chromedriver-win64\\chromedriver-win64\\chromedriver.exe");
         driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(130));
         driver.get("https://www.google.com/"); //Перейти на сайт
     }
 
@@ -35,28 +37,41 @@ public class NewTest {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(120));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[href='https://www.flypobeda.ru/']"))).click();
 
+
         // Дожидаемся загрузки страницы АК «Победа» и появления картинки с текстом «Полетели в Калининград»
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class, 'dp-1ihjhh6-root') and contains(text(), 'Полетели в Калининград')]")));
+
         // Проверяем, что текст на странице совпадает с ожидаемым
-        String pageText = driver.findElement(By.xpath("//div[contains(@class, 'dp-1ihjhh6-root') and contains(text(), 'Полетели в Калининград')]")).getText();
-        Assert.assertEquals("Полетели в Калининград!", pageText);
+
+        WebElement kaliningradText = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//div[contains(@class, 'dp-1ihjhh6-root') and contains(text(), 'Полетели в Калининград')]")));
+
+        // Проверяем, что текст на странице совпадает с ожидаемым
+        Assert.assertEquals("Полетели в Калининград!", kaliningradText.getText());
+
+        WebElement imageElement = driver.findElement(By.xpath("//img[contains(@src, '68665f32303236303331_f1cd.png')]"));
+
+
 
         // Кликаем на переключатель языка и выбираем английский язык
         driver.findElement(By.xpath("//button[@class='dp-11x0mgu-root-root']")).click();//эта кнопка найдена
         driver.findElement(By.xpath("//div[contains(@class,'dp-1ct2iey-root')]//div[2]")).click();//'эта тоже найдена
 
         // Убедимся, что на главной странице отображаются тексты "Ticket search", "Online check-in", "Manage my booking"
-        driver.findElement(By.xpath("//span[contains(@class,'dp-12qummd-root-inner') and text()='Ticket search']"));
-        driver.findElement(By.xpath("//span[contains(@class,'dp-12qummd-root-inner') and text()='Online check-in']"));
-        driver.findElement(By.xpath("//span[contains(@class,'dp-12qummd-root-inner') and text()='Manage my booking']"));
+        WebElement ticketSearch = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//span[contains(@class,'dp-12qummd-root-inner') and text()='Ticket search']")));
 
+        WebElement onlineCheckIn = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//span[contains(@class,'dp-12qummd-root-inner') and text()='Online check-in']")));
 
+        WebElement manageBooking = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//span[contains(@class,'dp-12qummd-root-inner') and text()='Manage my booking']")));
     }
 
-@After
-public void tearDown() {
-    driver.quit();
-}
+    @After
+    public void tearDown() {
+        driver.quit();
+    }
 
 
 }
